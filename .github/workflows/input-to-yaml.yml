@@ -1,4 +1,4 @@
-name: Substitute Deployment YAML
+name: Input to YAML Workflow
 
 on:
   workflow_dispatch:
@@ -22,23 +22,27 @@ on:
         default: 'immediate'
 
 jobs:
-  deploy:
+  process-inputs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the repository
+    # Step 1: Checkout the repository using the latest Node.js compatible version
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # Step 2: Replace placeholders in the deployment.yaml file
-    - name: Substitute values in deployment.yaml
+    # Step 2: Create a YAML file from input parameters
+    - name: Create deployment.yaml file from inputs
       run: |
-        sed -i 's/ENV_PLACEHOLDER/${{ github.event.inputs.environment }}/g' config/deployment.yaml
-        sed -i 's/VERSION_PLACEHOLDER/${{ github.event.inputs.version }}/g' config/deployment.yaml
-        sed -i 's/DEPLOYMENT_TIME_PLACEHOLDER/${{ github.event.inputs.deployment_time }}/g' config/deployment.yaml
+        echo "environment: ${{ github.event.inputs.environment }}" > deployment.yaml
+        echo "version: ${{ github.event.inputs.version }}" >> deployment.yaml
+        echo "deployment_time: ${{ github.event.inputs.deployment_time }}" >> deployment.yaml
 
-    # Step 3: Display the updated deployment.yaml
-    - name: Show updated deployment.yaml
-      run: cat config/deployment.yaml
+    # Step 3: Display the contents of the YAML file
+    - name: Show deployment.yaml contents
+      run: cat deployment.yaml
 
-    # (Optional) Step 4: Continue with deployment process, using the updated YAML file
+    # Step 4: Use the YAML content
+    - name: Use YAML content
+      run: |
+        environment=$(cat deployment.yaml | grep 'environment' | cut -d' ' -f2)
+        echo "Deploying to $environment environment"
