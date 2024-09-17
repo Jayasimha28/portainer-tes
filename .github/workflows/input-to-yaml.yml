@@ -1,0 +1,49 @@
+name: Input to YAML Workflow
+
+# Trigger manually via workflow_dispatch event
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select environment (dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      version:
+        description: 'Version to deploy'
+        required: true
+        default: '1.0.0'
+      deployment_time:
+        description: 'Time to deploy'
+        required: false
+        default: 'immediate'
+
+jobs:
+  process-inputs:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    # Step 2: Create a YAML file from input parameters
+    - name: Create deployment.yaml file from inputs
+      run: |
+        echo "environment: ${{ github.event.inputs.environment }}" > deployment.yaml
+        echo "version: ${{ github.event.inputs.version }}" >> deployment.yaml
+        echo "deployment_time: ${{ github.event.inputs.deployment_time }}" >> deployment.yaml
+
+    # Step 3: Display the contents of the YAML file
+    - name: Show deployment.yaml contents
+      run: cat deployment.yaml
+
+    # Step 4: Use the YAML content
+    - name: Use YAML content
+      run: |
+        environment=$(cat deployment.yaml | grep 'environment' | cut -d' ' -f2)
+        echo "Deploying to $environment environment"
