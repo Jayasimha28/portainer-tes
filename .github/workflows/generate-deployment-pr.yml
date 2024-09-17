@@ -1,7 +1,7 @@
-name: Generate Deployment YAML and Create PR
+name: Generate Deployment YAML and Push to Main
 
 permissions:
-  contents: write  # Allow the workflow to push to the repository and create a PR
+  contents: write  # Allow the workflow to push to the repository
 
 on:
   workflow_dispatch:
@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v3
 
       # Step 2: Set up Python and install Jinja2
-      - name: Set up Python
+      - name: Set up Python and install Jinja2
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
@@ -44,34 +44,4 @@ jobs:
       # Step 3: Generate the deployment.yaml file using Python script
       - name: Render Jinja template to generate deployment.yaml
         run: |
-          python generate_deployment.py "${{ github.event.inputs.environment }}" "${{ github.event.inputs.version }}" "${{ github.event.inputs.deployment_time }}"
-
-      # Step 4: Configure Git user
-      - name: Configure Git
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-
-      # Step 5: Create a new branch and commit changes
-      - name: Create new branch and commit changes
-        run: |
-          git checkout -b future-branch
-          git add deployment.yaml
-          git commit -m "Generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}"
-
-      # Step 6: Push the new branch
-      - name: Push branch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git push origin future-branch
-
-      # Step 7: Create a pull request from future-branch to main
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: future-branch
-          base: main
-          title: "Generated deployment.yaml for ${{ github.event.inputs.environment }} - ${{ github.event.inputs.version }}"
-          body: "This PR contains the generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}."
+         
