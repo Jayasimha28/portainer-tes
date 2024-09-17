@@ -1,6 +1,5 @@
 name: Input to YAML Workflow
 
-# Trigger manually via workflow_dispatch event
 on:
   workflow_dispatch:
     inputs:
@@ -27,9 +26,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the repository
+    # Step 1: Checkout the repository using the latest Node.js compatible version
     - name: Checkout Code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     # Step 2: Create a YAML file from input parameters
     - name: Create deployment.yaml file from inputs
