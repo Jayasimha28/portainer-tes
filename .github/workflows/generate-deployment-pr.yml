@@ -34,7 +34,7 @@ jobs:
       uses: actions/checkout@v3
 
     # Step 2: Set up Python and install Jinja2
-    - name: Set up Python and install Jinja2
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
@@ -55,9 +55,9 @@ rendered = template.render(
 with open('deployment.yaml', 'w') as f:
     f.write(rendered)
 "
-    
+
     # Step 4: Create a new branch (e.g., future-branch)
-    - name: Create new branch
+    - name: Create new branch and commit changes
       run: |
         git checkout -b future-branch
         git add deployment.yaml
