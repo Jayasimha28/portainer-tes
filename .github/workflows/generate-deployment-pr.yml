@@ -29,53 +29,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the repository
-    - name: Checkout the repository
-      uses: actions/checkout@v3
+      # Step 1: Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v3
 
-    # Step 2: Set up Python and install Jinja2
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-    - name: Install Jinja2
-      run: pip install Jinja2
+      # Step 2: Set up Python and install Jinja2
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Jinja2
+        run: pip install Jinja2
 
-    # Step 3: Generate the deployment.yaml file from Jinja template
-    - name: Render Jinja template to generate deployment.yaml
-      run: |
-        python -c "
-import jinja2
-template = jinja2.Template(open('templates/deployment.yaml.j2').read())
-rendered = template.render(
-  environment='${{ github.event.inputs.environment }}',
-  version='${{ github.event.inputs.version }}',
-  deployment_time='${{ github.event.inputs.deployment_time }}'
-)
-with open('deployment.yaml', 'w') as f:
-    f.write(rendered)
-"
+      # Step 3: Generate the deployment.yaml file using Python script
+      - name: Render Jinja template to generate deployment.yaml
+        run: |
+          python generate_deployment.py "${{ github.event.inputs.environment }}" "${{ github.event.inputs.version }}" "${{ github.event.inputs.deployment_time }}"
 
-    # Step 4: Create a new branch (e.g., future-branch)
-    - name: Create new branch and commit changes
-      run: |
-        git checkout -b future-branch
-        git add deployment.yaml
-        git commit -m "Generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}"
+      # Step 4: Create a new branch and commit changes
+      - name: Create new branch and commit changes
+        run: |
+          git checkout -b future-branch
+          git add deployment.yaml
+          git commit -m "Generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}"
 
-    # Step 5: Push the new branch
-    - name: Push branch
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        git push origin future-branch
+      # Step 5: Push the new branch
+      - name: Push branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin future-branch
 
-    # Step 6: Create a pull request from future-branch to main
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v5
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        branch: future-branch
-        base: main
-        title: "Generated deployment.yaml for ${{ github.event.inputs.environment }} - ${{ github.event.inputs.version }}"
-        body: "This PR contains the generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}."
+      # Step 6: Create a pull request from future-branch to main
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: future-branch
+          base: main
+          title: "Generated deployment.yaml for ${{ github.event.inputs.environment }} - ${{ github.event.inputs.version }}"
+          body: "This PR contains the generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}."
