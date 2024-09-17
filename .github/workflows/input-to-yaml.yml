@@ -1,5 +1,6 @@
-name: Input to YAML Workflow
+name: Generate and Commit Deployment YAML
 
+# Trigger workflow manually using the "workflow_dispatch" event
 on:
   workflow_dispatch:
     inputs:
@@ -22,27 +23,34 @@ on:
         default: 'immediate'
 
 jobs:
-  process-inputs:
+  generate_deployment:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: Checkout the repository using the latest Node.js compatible version
-    - name: Checkout Code
+    # Step 1: Checkout the repository to the runner
+    - name: Checkout the repository
       uses: actions/checkout@v3
 
-    # Step 2: Create a YAML file from input parameters
-    - name: Create deployment.yaml file from inputs
+    # Step 2: Create the deployment.yaml file from inputs
+    - name: Generate deployment.yaml file
       run: |
         echo "environment: ${{ github.event.inputs.environment }}" > deployment.yaml
         echo "version: ${{ github.event.inputs.version }}" >> deployment.yaml
         echo "deployment_time: ${{ github.event.inputs.deployment_time }}" >> deployment.yaml
 
-    # Step 3: Display the contents of the YAML file
-    - name: Show deployment.yaml contents
-      run: cat deployment.yaml
-
-    # Step 4: Use the YAML content
-    - name: Use YAML content
+    # Step 3: Configure git to commit the changes
+    - name: Configure Git
       run: |
-        environment=$(cat deployment.yaml | grep 'environment' | cut -d' ' -f2)
-        echo "Deploying to $environment environment"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+    # Step 4: Commit the generated deployment.yaml
+    - name: Commit deployment.yaml
+      run: |
+        git add deployment.yaml
+        git commit -m "Generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}"
+
+    # Step 5: Push the changes back to the repository
+    - name: Push changes to main
+      run: |
+        git push origin main
