@@ -1,6 +1,9 @@
 name: Generate and Commit Deployment YAML
 
-# Trigger workflow manually using the "workflow_dispatch" event
+# Grant write permissions to the workflow
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -50,7 +53,9 @@ jobs:
         git add deployment.yaml
         git commit -m "Generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}"
 
-    # Step 5: Push the changes back to the repository
+    # Step 5: Push the changes back to the main branch
     - name: Push changes to main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
       run: |
         git push origin main
