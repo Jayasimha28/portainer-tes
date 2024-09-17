@@ -44,4 +44,19 @@ jobs:
       # Step 3: Generate the deployment.yaml file using Python script
       - name: Render Jinja template to generate deployment.yaml
         run: |
-         
+          python generate_deployment.py "${{ github.event.inputs.environment }}" "${{ github.event.inputs.version }}" "${{ github.event.inputs.deployment_time }}"
+
+      # Step 4: Configure Git user
+      - name: Configure Git
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      # Step 5: Commit changes to the main branch
+      - name: Commit changes to main
+        run: |
+          git checkout main
+          git pull origin main
+          git add deployment.yaml
+          git commit -m "Generated deployment.yaml for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}"
+          git push origin main
