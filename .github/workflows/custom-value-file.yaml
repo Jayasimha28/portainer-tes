@@ -1,4 +1,4 @@
-name: Generate Custom Values YAML and Push to Main using Ansible
+name: Generate Custom Values YAML and Push to Main
 
 permissions:
   contents: write  # Allow the workflow to push to the repository
@@ -57,7 +57,7 @@ jobs:
             -e "deployment_time=${{ github.event.inputs.deployment_time }}" \
             -e "output_file=${{ env.FILE_NAME }}"  # Pass custom file name
 
-      # Step 5: Verify that the file was created
+      # Step 5: Verify the generated file
       - name: Verify generated file
         run: |
           ls -al  # List files in the working directory
