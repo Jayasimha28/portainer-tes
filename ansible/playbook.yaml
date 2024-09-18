@@ -1,0 +1,16 @@
+# playbook.yaml
+
+---
+- name: Generate custom values.yaml from Jinja2 template
+  hosts: localhost
+  gather_facts: false
+  vars:
+    environment: "{{ environment }}"
+    version: "{{ version }}"
+    deployment_time: "{{ deployment_time }}"
+    output_file: "{{ output_file }}"  # Custom output file name passed from GitHub Action
+  tasks:
+    - name: Render Jinja2 template to custom values.yaml
+      template:
+        src: templates/values-template.j2
+        dest: "./{{ output_file }}"  # Save the file with the custom name
