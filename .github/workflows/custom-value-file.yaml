@@ -1,4 +1,4 @@
-name: Generate Custom Values YAML and Push to Main
+name: Generate Custom Values YAML and Push to Main using Ansible
 
 permissions:
   contents: write  # Allow the workflow to push to the repository
