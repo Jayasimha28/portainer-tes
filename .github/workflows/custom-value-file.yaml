@@ -60,6 +60,7 @@ jobs:
       # Step 5: Verify the generated file
       - name: Verify generated file
         run: |
+          mv ansible/${{ env.FILE_NAME }} .
           ls -al  # List files in the working directory
           ls -al ansible/  # List files in the working directory
           ls -al templates/  # List files in the working directory
