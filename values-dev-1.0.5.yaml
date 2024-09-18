@@ -1,0 +1,5 @@
+# templates/values-template.j2
+
+environment: []
+version: 1.0.5
+    deployment_time: immediate
