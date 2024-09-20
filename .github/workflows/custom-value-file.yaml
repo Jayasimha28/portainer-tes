@@ -1,7 +1,7 @@
-name: Generate Custom Values YAML and Push to Main using Ansible
+name: Generate Custom Values YAML using Ansible, Create Branch, and Raise PR
 
 permissions:
-  contents: write  # Allow the workflow to push to the repository
+  contents: write  # Allow the workflow to push to the repository and create PRs
 
 on:
   workflow_dispatch:
@@ -69,11 +69,16 @@ jobs:
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
-      # Step 7: Commit and push custom values.yaml to main
-      - name: Commit and push custom values.yaml to main
+      # Step 7: Create a new temporary branch
+      - name: Create temporary branch
+        id: create_branch
         run: |
-          git checkout main
-          git pull origin main
-          git add "${{ env.FILE_NAME }}"  # Add the custom file
+          BRANCH_NAME="generated-values-${{ github.event.inputs.environment }}-${{ github.event.inputs.version }}-$(date +%s)"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          git checkout -b $BRANCH_NAME
+          git add "${{ env.FILE_NAME }}"
           git commit -m "Generated ${{ env.FILE_NAME }} for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}"
-          git push origin main
+          git push origin $BRANCH_NAME
+
+      # Step 8: Create a pull request
+      - name: Create Pull Request
