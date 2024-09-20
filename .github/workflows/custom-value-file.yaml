@@ -90,7 +90,8 @@ jobs:
             const prTitle = `Generated ${{ env.FILE_NAME }} for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}`;
             const prBody = `This PR includes the generated ${process.env.FILE_NAME} for the environment \`${{ github.event.inputs.environment }}\` and version \`${{ github.event.inputs.version }}\``;
 
-            const { data: pullRequest } = await github.pulls.create({
+            // Using github.rest to access the Pull Request API
+            const pullRequest = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: prTitle,
@@ -99,4 +100,4 @@ jobs:
               base: 'main'
             });
 
-            console.log(`Pull Request created: ${pullRequest.html_url}`);
+            console.log(`Pull Request created: ${pullRequest.data.html_url}`);
