@@ -1,4 +1,4 @@
-name: Generate Custom Values YAML, Create Branch, and Raise PR
+name: Generate Custom Values YAML using Ansible, Create Branch, and Raise PR
 
 permissions:
   contents: write  # Allow the workflow to push to the repository and create PRs
