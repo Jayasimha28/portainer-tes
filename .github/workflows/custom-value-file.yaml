@@ -1,4 +1,4 @@
-name: Generate Custom Values YAML using Ansible, Create Branch, and Raise PR
+name: Generate Custom Values YAML, Create Branch, and Raise PR
 
 permissions:
   contents: write  # Allow the workflow to push to the repository and create PRs
@@ -82,3 +82,21 @@ jobs:
 
       # Step 8: Create a pull request
       - name: Create Pull Request
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branchName = process.env.BRANCH_NAME;
+            const prTitle = `Generated ${{ env.FILE_NAME }} for environment ${{ github.event.inputs.environment }} and version ${{ github.event.inputs.version }}`;
+            const prBody = `This PR includes the generated ${process.env.FILE_NAME} for the environment \`${{ github.event.inputs.environment }}\` and version \`${{ github.event.inputs.version }}\``;
+
+            const { data: pullRequest } = await github.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: prTitle,
+              body: prBody,
+              head: branchName,
+              base: 'main'
+            });
+
+            console.log(`Pull Request created: ${pullRequest.html_url}`);
